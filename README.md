@@ -1,7 +1,7 @@
 # Clostco Dashboard
 
-[![CI](https://img.shields.io/github/actions/workflow/status/ayuspoudel/clostco_dashboard_frontend/ci.yml?label=CI)](https://github.com/ayuspoudel/clostco_dashboard_frontend/actions)
-[![License](https://img.shields.io/github/license/ayuspoudel/clostco_dashboard_frontend)](./LICENSE)
+<!-- [![CI](https://img.shields.io/github/actions/workflow/status/ayuspoudel/clostco_dashboard_frontend/ci.yml?label=CI)](https://github.com/ayuspoudel/clostco_dashboard_frontend/actions) -->
+[![License](https://img.shields.io/github/license/ayuspoudel/clostco-dashboard-frontend)](./LICENSE)
 [![Vite](https://img.shields.io/badge/Built%20with-Vite-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Vue](https://img.shields.io/badge/Powered%20by-Vue%203-42B883?logo=vue.js&logoColor=white)](https://vuejs.org/)
 [![Status](https://img.shields.io/badge/Status-WIP-orange)](#)
