@@ -19,7 +19,8 @@ const routes = [
         name: 'Home',
         component: HomePage,
         meta: {
-          title: 'Home'
+          title: 'Home',
+          icon: 'Home' // 👈 optional for consistency
         }
       },
 
@@ -30,7 +31,7 @@ const routes = [
         meta: {
           section: 'Clost',
           title: 'Overview',
-          icon: 'DollarSign',
+          icon: 'CloudCog', // 💡 replaced DollarSign with CloudCog for "cloud + cost"
           description: 'AI-powered AWS cost insights.'
         }
       },
