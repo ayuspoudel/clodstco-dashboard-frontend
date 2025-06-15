@@ -1,7 +1,6 @@
 <!-- src/App.vue -->
 <template>
   <div>
-    <NavigationBar />
     <router-view />
   </div>
 </template>
