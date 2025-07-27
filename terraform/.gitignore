@@ -1,0 +1,35 @@
+# Local .terraform files
+**/.terraform/
+**/.terraform.lock.hcl
+
+# Sensitive variables and credentials
+*.tfvars
+*.tfvars.json
+terraform.tfstate
+terraform.tfstate.backup
+crash.log
+
+# IDE/editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Ansible SSH keys (if present)
+*.pem
+*.key
+
+# System files
+*.log
+*.bak
+*.tmp
+
+# Terraform plan files
+*.tfplan
+
+# Override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
