@@ -20,13 +20,14 @@ resource "aws_iam_role" "github_oidc_role" {
       },
       Action = "sts:AssumeRoleWithWebIdentity",
       Condition = {
-        StringEquals = {
-          "token.actions.githubusercontent.com:sub" = "repo:${var.github_repo}"
+        StringLike = {
+          "token.actions.githubusercontent.com:sub" = "repo:${var.github_repo}:*"
         }
       }
     }]
   })
 }
+
 
 resource "aws_iam_role_policy_attachment" "attach_admin" {
   role       = aws_iam_role.github_oidc_role.name
