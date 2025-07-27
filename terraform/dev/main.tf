@@ -2,13 +2,8 @@ provider "aws" {
   region = "us-east-1"
 }
 
-locals {
-  tags = {
-    project     = "clodstco"
-    environment = "dev"
-  }
-}
 
+# VPC with public and private subnet
 module "vpc" {
   source               = "./modules/vpc"
   name                 = "clodstco"
@@ -20,9 +15,10 @@ module "vpc" {
   tags                 = local.tags
 }
 
-module "eks_sg" {
+# Security group to allow internal traffic and SSH/WireGuard
+module "ec2_sg" {
   source = "./modules/sg"
-  name   = "clodstco-eks-sg"
+  name   = "clodstco-ec2-sg"
   vpc_id = module.vpc.vpc_id
 
   ingress_rules = [
@@ -32,21 +28,35 @@ module "eks_sg" {
       to_port     = 0
       protocol    = "-1"
       cidr_blocks = ["10.0.0.0/16"]
+    },
+    {
+      description = "allow SSH"
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    {
+      description = "allow WireGuard"
+      from_port   = 51820
+      to_port     = 51820
+      protocol    = "udp"
+      cidr_blocks = ["0.0.0.0/0"]
     }
   ]
 
   tags = local.tags
 }
 
-module "eks" {
-  source              = "./modules/eks"
-  name                = "clodstco"
-  subnet_ids          = module.vpc.private_subnet_ids
-  security_group_ids  = [module.eks_sg.security_group_id]
-  kubernetes_version  = "1.29"
-  node_instance_type  = "t3.medium"
-  node_min_size       = 1
-  node_max_size       = 1
-  node_desired_size   = 1
-  tags                = local.tags
+# EC2 instance (can be NAT, WireGuard, jump box)
+module "ec2_instance" {
+  source            = "./modules/ec2-instance"
+  name              = "clodstco-gateway"
+  ami_id            = "ami-020cba7c55df1f615" # Ubuntu 22.04 (us-east-1)
+  instance_type     = "t2.micro"
+  key_name          = "clodscto-keypair"         
+  subnet_id         = module.vpc.public_subnet_ids[0]
+  security_group_id = module.ec2_sg.security_group_id
+  source_dest_check = false                   # NAT-compatible
+  tags              = local.tags
 }
