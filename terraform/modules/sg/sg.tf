@@ -2,28 +2,31 @@ resource "aws_security_group" "this" {
   name        = var.name
   description = var.description
   vpc_id      = var.vpc_id
+  tags        = var.tags
+}
 
-  dynamic "ingress" {
-    for_each = var.ingress_rules
-    content {
-      description = ingress.value.description
-      from_port   = ingress.value.from_port
-      to_port     = ingress.value.to_port
-      protocol    = ingress.value.protocol
-      cidr_blocks = ingress.value.cidr_blocks
-    }
-  }
+resource "aws_security_group_rule" "ingress" {
+  count             = length(var.ingress_rules)
+  type              = "ingress"
+  from_port         = var.ingress_rules[count.index].from_port
+  to_port           = var.ingress_rules[count.index].to_port
+  protocol          = var.ingress_rules[count.index].protocol
+  cidr_blocks       = lookup(var.ingress_rules[count.index], "cidr_blocks", null)
+  ipv6_cidr_blocks  = lookup(var.ingress_rules[count.index], "ipv6_cidr_blocks", null)
+  prefix_list_ids   = lookup(var.ingress_rules[count.index], "prefix_list_ids", null)
+  security_group_id = aws_security_group.this.id
+  description       = lookup(var.ingress_rules[count.index], "description", null)
+}
 
-  dynamic "egress" {
-    for_each = var.egress_rules
-    content {
-      description = egress.value.description
-      from_port   = egress.value.from_port
-      to_port     = egress.value.to_port
-      protocol    = egress.value.protocol
-      cidr_blocks = egress.value.cidr_blocks
-    }
-  }
-
-  tags = var.tags
+resource "aws_security_group_rule" "egress" {
+  count             = length(var.egress_rules)
+  type              = "egress"
+  from_port         = var.egress_rules[count.index].from_port
+  to_port           = var.egress_rules[count.index].to_port
+  protocol          = var.egress_rules[count.index].protocol
+  cidr_blocks       = lookup(var.egress_rules[count.index], "cidr_blocks", null)
+  ipv6_cidr_blocks  = lookup(var.egress_rules[count.index], "ipv6_cidr_blocks", null)
+  prefix_list_ids   = lookup(var.egress_rules[count.index], "prefix_list_ids", null)
+  security_group_id = aws_security_group.this.id
+  description       = lookup(var.egress_rules[count.index], "description", null)
 }
