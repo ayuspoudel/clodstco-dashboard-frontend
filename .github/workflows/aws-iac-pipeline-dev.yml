@@ -72,7 +72,7 @@ jobs:
 
       - name: Terraform Apply
         working-directory: terraform/cloud-aws-dev
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -auto-approve 
 
   terraform-destroy:
     name: Terraform Destroy
