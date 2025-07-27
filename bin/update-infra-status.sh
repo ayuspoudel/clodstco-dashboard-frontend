@@ -17,20 +17,21 @@ else
   cat > "$FILE" <<EOF
 # infra status – $DATE_STR
 
-done:
+## done:
+---
 
+## currently running:
+---
 
-currently running:
+## what's next:
+### optional:
+---
 
+### must do:
+---
 
-what's next:
-optional:
-
-
-must do:
-
-
-later:
+### later:
+---
 EOF
 fi
 
