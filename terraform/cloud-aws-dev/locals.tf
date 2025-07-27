@@ -6,7 +6,7 @@ locals {
     team            = "platform"
     repo            = "ayuspoudel/clodstco-dashboard-frontend"
     purpose         = "cloud-gateway" # can be rds / vpn / nat / general
-    provisioned_by  = "terraform"
+    provisioned_by  = "Terraform"
     managed_by      = "IaC"
     created_by      = "github-actions"
   }
