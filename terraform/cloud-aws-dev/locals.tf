@@ -10,4 +10,4 @@ locals {
     managed_by      = "IaC"
     created_by      = "github-actions"
   }
-}
+}  
