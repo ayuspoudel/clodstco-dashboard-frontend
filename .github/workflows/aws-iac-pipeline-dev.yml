@@ -1,4 +1,3 @@
-
 name: AWS Dev Infra Pipeline
 
 on:
@@ -6,8 +5,8 @@ on:
     branches:
       - main
     paths:
-      - 'cloud-aws-dev/**'
-      - 'modules/**'
+      - './terraform/cloud-aws-dev/**'
+      - './terraform/modules/**'
   workflow_dispatch:
 
 permissions:
@@ -15,9 +14,11 @@ permissions:
   contents: read
 
 jobs:
-  terraform-plan:
-    name: Terraform Plan
+  terraform-init:
+    name: Terraform Init
     runs-on: ubuntu-latest
+    outputs:
+      tf_cache_key: ${{ steps.cache.outputs.cache-hit }}
 
     steps:
       - name: Checkout
@@ -35,17 +36,61 @@ jobs:
           terraform_version: 1.8.3
 
       - name: Terraform Init
-        working-directory: cloud-aws-dev
+        working-directory: terraform/cloud-aws-dev
         run: terraform init -reconfigure
 
+  terraform-validate:
+    name: Terraform Validate
+    runs-on: ubuntu-latest
+    needs: terraform-init
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/gha-deploy-role
+          aws-region: us-east-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.3
+
+      - name: Terraform Validate
+        working-directory: terraform/cloud-aws-dev
+        run: terraform validate
+
+  terraform-plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    needs: terraform-validate
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/gha-deploy-role
+          aws-region: us-east-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.3
+
       - name: Terraform Plan
-        working-directory: cloud-aws-dev
+        working-directory: terraform/cloud-aws-dev
         run: terraform plan -out=tfplan
 
   terraform-apply:
     name: Terraform Apply
-    needs: terraform-plan
     runs-on: ubuntu-latest
+    needs: terraform-plan
     environment: live-infra
 
     steps:
@@ -64,18 +109,18 @@ jobs:
           terraform_version: 1.8.3
 
       - name: Terraform Init
-        working-directory: cloud-aws-dev
+        working-directory: terraform/cloud-aws-dev
         run: terraform init -reconfigure
 
       - name: Terraform Apply
-        working-directory: cloud-aws-dev
+        working-directory: terraform/cloud-aws-dev
         run: terraform apply -auto-approve tfplan
 
   terraform-destroy:
     name: Terraform Destroy
     runs-on: ubuntu-latest
+    needs: terraform-apply
     environment: destroy-infra
-    if: github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout
@@ -93,9 +138,9 @@ jobs:
           terraform_version: 1.8.3
 
       - name: Terraform Init
-        working-directory: cloud-aws-dev
+        working-directory: terraform/cloud-aws-dev
         run: terraform init -reconfigure
 
       - name: Terraform Destroy
-        working-directory: cloud-aws-dev
+        working-directory: terraform/cloud-aws-dev
         run: terraform destroy -auto-approve
