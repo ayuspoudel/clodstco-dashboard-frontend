@@ -10,41 +10,44 @@ variable "description" {
 }
 
 variable "vpc_id" {
-  description = "VPC ID where the SG will be created"
+  description = "ID of the VPC"
   type        = string
 }
 
 variable "ingress_rules" {
-  description = "List of ingress rule maps"
+  description = "List of ingress rule objects"
   type = list(object({
-    description = string
-    from_port   = number
-    to_port     = number
-    protocol    = string
-    cidr_blocks = list(string)
+    from_port        = number
+    to_port          = number
+    protocol         = string
+    description      = optional(string)
+    cidr_blocks      = optional(list(string))
+    ipv6_cidr_blocks = optional(list(string))
+    prefix_list_ids  = optional(list(string))
   }))
 }
 
 variable "egress_rules" {
-  description = "List of egress rule maps"
+  description = "List of egress rule objects"
   type = list(object({
-    description = string
-    from_port   = number
-    to_port     = number
-    protocol    = string
-    cidr_blocks = list(string)
+    from_port        = number
+    to_port          = number
+    protocol         = string
+    description      = optional(string)
+    cidr_blocks      = optional(list(string))
+    ipv6_cidr_blocks = optional(list(string))
+    prefix_list_ids  = optional(list(string))
   }))
   default = [{
-    description = "Allow all outbound"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
+    description = "Allow all egress"
     cidr_blocks = ["0.0.0.0/0"]
   }]
 }
 
 variable "tags" {
-  description = "Tags to apply to the SG"
+  description = "Map of tags to apply to the security group"
   type        = map(string)
-  default     = {}
 }
