@@ -1,1 +1,2 @@
-[![AWS Dev Infra Pipeline](https://github.com/ayuspoudel/clodstco-dashboard-frontend/actions/workflows/aws-iac-pipeline-dev.yml/badge.svg)](https://github.com/ayuspoudel/clodstco-dashboard-frontend/actions/workflows/aws-iac-pipeline-dev.yml)
+[![AWS Dev Infra Pipeline](https://github.com/ayuspoudel/clodstco-dashboard-frontend/actions/workflows/aws-iac-pipeline-dev.yml/badge.svg)](https://github.com/ayuspoudel/clodstco-dashboard-frontend/actions/workflows/iac-pipeline-aws-dev.yml) <br>
+[![OCI Dev Infra Pipeline](https://github.com/ayuspoudel/clodstco-dashboard-frontend/actions/workflows/iac-pipeline-oci-dev.yml/badge.svg)](https://github.com/ayuspoudel/clodstco-dashboard-frontend/actions/workflows/iac-pipeline-oci-dev.yml)
