@@ -5,7 +5,7 @@ provider "aws" {
 
 # VPC with public and private subnet
 module "vpc" {
-  source               = "../modules/vpc"
+  source               = "../modules/aws-vpc"
   name                 = "clodstco"
   enable_ha            = false
   vpc_cidr             = "10.0.0.0/16"
@@ -17,7 +17,7 @@ module "vpc" {
 
 # Security group to allow internal traffic and SSH/WireGuard
 module "ec2_sg" {
-  source = "../modules/sg"
+  source = "../modules/aws-sg"
   name   = "clodstco-ec2-sg"
   vpc_id = module.vpc.vpc_id
 
@@ -50,7 +50,7 @@ module "ec2_sg" {
 
 # EC2 instance (can be NAT, WireGuard, jump box)
 module "ec2_instance" {
-  source            = "../modules/ec2"
+  source            = "../modules/aws-ec2"
   name              = "clodstco-gateway"
   ami_id            = "ami-020cba7c55df1f615" # Ubuntu 22.04 (us-east-1)
   instance_type     = "t2.micro"
