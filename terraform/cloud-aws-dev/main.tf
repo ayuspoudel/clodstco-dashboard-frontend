@@ -58,7 +58,7 @@ module "ec2_sg" {
 module "bastion_instance" {
   source              = "../modules/aws-ec2"
   name                = "clodstco-bastion"
-  ami_id              = "ami-0d1b5a8c13042c939"
+  ami_id              = "ami-020cba7c55df1f615"
   instance_type       = "t2.micro"
   key_name            = module.keypair.key_name
   subnet_id           = module.vpc.public_subnet_ids[0]
@@ -81,7 +81,7 @@ module "bastion_instance" {
 module "k8s_master" {
   source              = "../modules/aws-ec2"
   name                = "k8s-master-1"
-  ami_id              = "ami-0d1b5a8c13042c939"
+  ami_id              = "ami-020cba7c55df1f615"
   instance_type       = "t2.micro"
   key_name            = module.keypair.key_name
   subnet_id           = module.vpc.private_subnet_ids[0]
@@ -102,7 +102,7 @@ module "k8s_master" {
 module "k8s_worker_1" {
   source              = "../modules/aws-ec2"
   name                = "k8s-worker-1"
-  ami_id              = "ami-0d1b5a8c13042c939"
+  ami_id              = "ami-020cba7c55df1f615"
   instance_type       = "t2.micro"
   key_name            = module.keypair.key_name
   subnet_id           = module.vpc.private_subnet_ids[0]
