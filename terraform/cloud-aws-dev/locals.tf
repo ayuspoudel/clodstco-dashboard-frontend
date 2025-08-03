@@ -9,4 +9,5 @@ locals {
     managed_by      = "IaC"
     created_by      = "github-actions"
   }
+  az = "us-east-1"
 }  
