@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - './terraform/cloud-aws-dev/**'
-      - './terraform/modules/**'
   workflow_dispatch:
 
 permissions:
@@ -102,3 +101,5 @@ jobs:
       - name: Terraform Destroy
         working-directory: terraform/cloud-aws-dev
         run: terraform destroy -auto-approve
+        
+
