@@ -2,7 +2,14 @@ provider "aws" {
   region = "us-east-1"
 }
 
+locals {
+  tags = {
+    Project     = "clodstco"
+    Environment = "dev"
+  }
 
+  az = "us-east-1a"
+}
 
 module "keypair" {
   source          = "../modules/aws-keypair"
@@ -19,7 +26,7 @@ module "vpc" {
   vpc_cidr             = "10.0.0.0/16"
   public_subnet_cidrs  = ["10.0.1.0/24"]
   private_subnet_cidrs = ["10.0.2.0/24"]
-  availability_zones   = ["us-east-1a"]
+  availability_zones   = [local.az]
   tags                 = local.tags
 }
 
@@ -63,20 +70,22 @@ module "bastion_instance" {
   key_name            = module.keypair.key_name
   subnet_id           = module.vpc.public_subnet_ids[0]
   security_group_id   = module.ec2_sg.security_group_id
-  source_dest_check   = false  # Required for NAT role
-  availability_zone   = "us-east-1a"
-  root_device_name    = "/dev/xvda"
-  volume_size         = 8
-  volume_type         = "gp3"
+  source_dest_check   = false
+  availability_zone   = local.az
   associate_public_ip = true
 
+  root_block_device = {
+    volume_size = 8
+    volume_type = "gp3"
+    delete_on_termination = true
+  }
+
   tags = merge(local.tags, {
-    Name         = "clodstco-bastion"
-    role         = "ssh-bastion"
-    purpose      = "jump-host"
+    Name    = "clodstco-bastion"
+    role    = "ssh-bastion"
+    purpose = "jump-host"
   })
 }
-
 
 module "k8s_master" {
   source              = "../modules/aws-ec2"
@@ -87,12 +96,15 @@ module "k8s_master" {
   subnet_id           = module.vpc.private_subnet_ids[0]
   security_group_id   = module.ec2_sg.security_group_id
   source_dest_check   = false
-  availability_zone   = "us-east-1a"
-  root_device_name    = "/dev/xvda"
-  volume_size         = 8
-  volume_type         = "gp3"
+  availability_zone   = local.az
   associate_public_ip = false
   spot_instance       = false
+
+  root_block_device = {
+    volume_size = 8
+    volume_type = "gp3"
+    delete_on_termination = true
+  }
 
   tags = merge(local.tags, {
     "kubernetes-role" = "master"
@@ -108,12 +120,15 @@ module "k8s_worker_1" {
   subnet_id           = module.vpc.private_subnet_ids[0]
   security_group_id   = module.ec2_sg.security_group_id
   source_dest_check   = false
-  availability_zone   = "us-east-1a"
-  root_device_name    = "/dev/xvda"
-  volume_size         = 8
-  volume_type         = "gp3"
+  availability_zone   = local.az
   associate_public_ip = false
   spot_instance       = true
+
+  root_block_device = {
+    volume_size = 8
+    volume_type = "gp3"
+    delete_on_termination = true
+  }
 
   tags = merge(local.tags, {
     "kubernetes-role" = "worker"

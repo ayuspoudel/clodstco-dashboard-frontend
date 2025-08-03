@@ -4,85 +4,79 @@ variable "name" {
 }
 
 variable "ami_id" {
-  description = "AMI ID to use"
+  description = "AMI ID to use for the instance"
   type        = string
 }
 
 variable "instance_type" {
-  description = "Instance type"
+  description = "EC2 instance type (e.g., t3.micro)"
   type        = string
 }
 
 variable "key_name" {
-  description = "SSH key name"
+  description = "SSH key pair name"
   type        = string
 }
 
 variable "subnet_id" {
-  description = "Subnet ID"
+  description = "ID of the subnet to launch the instance in"
   type        = string
 }
 
 variable "security_group_id" {
-  description = "Security Group ID"
+  description = "ID of the security group to associate with the instance"
+  type        = string
+}
+
+variable "availability_zone" {
+  description = "Availability Zone for the instance and any volumes"
   type        = string
 }
 
 variable "tags" {
-  description = "Tags for the instance"
+  description = "Tags to apply to all resources"
   type        = map(string)
   default     = {}
 }
 
 variable "source_dest_check" {
-  description = "Enable/disable source-destination check"
+  description = "Enable or disable source/destination checking"
   type        = bool
   default     = true
 }
 
 variable "associate_public_ip" {
-  description = "Assign public IP address"
+  description = "Whether to associate a public IP address"
   type        = bool
   default     = false
 }
 
 variable "user_data" {
-  description = "Startup script"
+  description = "Optional startup script for the instance"
   type        = string
   default     = ""
 }
 
 variable "spot_instance" {
-  description = "Launch as a spot instance"
+  description = "Launch instance as a Spot instance"
   type        = bool
   default     = false
 }
 
-variable "availability_zone" {
-  description = "Availability zone (must match subnet AZ)"
-  type        = string
-}
-
 variable "volume_size" {
-  description = "Root EBS volume size (GB)"
+  description = "Size of the root EBS volume in GB"
   type        = number
   default     = 40
 }
 
 variable "volume_type" {
-  description = "Root volume type"
+  description = "Type of the root EBS volume (e.g., gp3)"
   type        = string
   default     = "gp3"
 }
 
-variable "root_device_name" {
-  description = "Device name for root volume"
-  type        = string
-  default     = "/dev/xvda"
-}
-
 variable "additional_ebs_volume" {
-  description = "Optional secondary EBS volume"
+  description = "Optional configuration for a secondary EBS volume"
   type = object({
     device_name = string
     volume_size = number
