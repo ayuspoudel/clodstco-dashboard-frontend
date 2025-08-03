@@ -34,4 +34,13 @@ resource "aws_iam_role_policy_attachment" "attach_admin" {
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
+module "remote_backend" {
+  source          = "../modules/remote-backend"
+  bucket_name     = "clodstco-terraform-state"
+  lock_table_name = "terraform-locks"
+  tags = {
+    environment = "dev"
+    owner       = "clodstco"
+  }
+}
 
