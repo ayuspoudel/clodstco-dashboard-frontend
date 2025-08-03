@@ -1,42 +1,92 @@
 variable "name" {
-  description = "Name tag for the instance"
+  description = "Name of the EC2 instance"
   type        = string
 }
 
 variable "ami_id" {
-  description = "AMI ID to use (Ubuntu, Amazon Linux, etc)"
+  description = "AMI ID to use"
   type        = string
 }
 
 variable "instance_type" {
-  description = "EC2 instance type"
+  description = "Instance type"
   type        = string
-  default     = "t3.micro"
 }
 
 variable "key_name" {
-  description = "Name of the SSH key pair"
+  description = "SSH key name"
   type        = string
 }
 
 variable "subnet_id" {
-  description = "Subnet ID to launch into"
+  description = "Subnet ID"
   type        = string
 }
 
 variable "security_group_id" {
-  description = "Security group to attach"
+  description = "Security Group ID"
   type        = string
 }
 
+variable "tags" {
+  description = "Tags for the instance"
+  type        = map(string)
+  default     = {}
+}
+
 variable "source_dest_check" {
-  description = "Set to false for NAT instances"
+  description = "Enable/disable source-destination check"
   type        = bool
   default     = true
 }
 
-variable "tags" {
-  description = "Additional tags"
-  type        = map(string)
-  default     = {}
+variable "associate_public_ip" {
+  description = "Assign public IP address"
+  type        = bool
+  default     = false
+}
+
+variable "user_data" {
+  description = "Startup script"
+  type        = string
+  default     = ""
+}
+
+variable "spot_instance" {
+  description = "Launch as a spot instance"
+  type        = bool
+  default     = false
+}
+
+variable "availability_zone" {
+  description = "Availability zone (must match subnet AZ)"
+  type        = string
+}
+
+variable "volume_size" {
+  description = "Root EBS volume size (GB)"
+  type        = number
+  default     = 40
+}
+
+variable "volume_type" {
+  description = "Root volume type"
+  type        = string
+  default     = "gp3"
+}
+
+variable "root_device_name" {
+  description = "Device name for root volume"
+  type        = string
+  default     = "/dev/xvda"
+}
+
+variable "additional_ebs_volume" {
+  description = "Optional secondary EBS volume"
+  type = object({
+    device_name = string
+    volume_size = number
+    volume_type = string
+  })
+  default = null
 }
