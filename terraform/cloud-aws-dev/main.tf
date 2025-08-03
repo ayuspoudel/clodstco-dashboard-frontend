@@ -2,12 +2,7 @@ provider "aws" {
   region = "us-east-1"
 }
 
-locals {
-  tags = {
-    Project     = "clodstco"
-    Environment = "dev"
-  }
-}
+
 
 module "keypair" {
   source          = "../modules/aws-keypair"
