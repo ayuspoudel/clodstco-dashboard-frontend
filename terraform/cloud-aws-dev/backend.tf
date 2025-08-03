@@ -7,10 +7,10 @@ terraform {
     }
   }
   backend "s3" {
-    bucket         = "terraform-backend-ayush-bucket"
-    key            = "clodstco/dev/terraform.tfstate"     # for dev stack
+    bucket         = "clodstco-terraform-state"
+    key            = "dev/terraform.tfstate"     # for dev stack
     region         = "us-east-1"
-    dynamodb_table = "terraform-backend-ayush-locks"
+    dynamodb_table = "terraform-locks"
     encrypt        = true
   }
 }
