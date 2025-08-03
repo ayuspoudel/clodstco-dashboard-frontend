@@ -2,8 +2,21 @@ provider "aws" {
   region = "us-east-1"
 }
 
+locals {
+  tags = {
+    Project     = "clodstco"
+    Environment = "dev"
+  }
+}
 
-# VPC with public and private subnet
+module "keypair" {
+  source          = "../modules/aws-keypair"
+  key_name        = "clodstco-keypair"
+  backup_to_ssm   = true
+  local_backup    = false
+  tags            = local.tags
+}
+
 module "vpc" {
   source               = "../modules/aws-vpc"
   name                 = "clodstco"
@@ -15,7 +28,6 @@ module "vpc" {
   tags                 = local.tags
 }
 
-# Security group to allow internal traffic and SSH/WireGuard
 module "ec2_sg" {
   source = "../modules/aws-sg"
   name   = "clodstco-ec2-sg"
@@ -48,15 +60,67 @@ module "ec2_sg" {
   tags = local.tags
 }
 
-# EC2 instance (can be NAT, WireGuard, jump box)
-module "ec2_instance" {
-  source            = "../modules/aws-ec2"
-  name              = "clodstco-gateway"
-  ami_id            = "ami-020cba7c55df1f615" # Ubuntu 22.04 (us-east-1)
-  instance_type     = "t2.micro"
-  key_name          = "clodscto-keypair"         
-  subnet_id         = module.vpc.public_subnet_ids[0]
-  security_group_id = module.ec2_sg.security_group_id
-  source_dest_check = false                   # NAT-compatible
-  tags              = local.tags
+module "bastion_instance" {
+  source              = "../modules/aws-ec2"
+  name                = "clodstco-bastion"
+  ami_id              = "ami-0d1b5a8c13042c939"
+  instance_type       = "t2.micro"
+  key_name            = module.keypair.key_name
+  subnet_id           = module.vpc.public_subnet_ids[0]
+  security_group_id   = module.ec2_sg.security_group_id
+  source_dest_check   = false  # Required for NAT role
+  availability_zone   = "us-east-1a"
+  root_device_name    = "/dev/xvda"
+  volume_size         = 8
+  volume_type         = "gp3"
+  associate_public_ip = true
+
+  tags = merge(local.tags, {
+    Name         = "clodstco-bastion"
+    role         = "ssh-bastion"
+    purpose      = "jump-host"
+  })
+}
+
+
+module "k8s_master" {
+  source              = "../modules/aws-ec2"
+  name                = "k8s-master-1"
+  ami_id              = "ami-0d1b5a8c13042c939"
+  instance_type       = "t2.micro"
+  key_name            = module.keypair.key_name
+  subnet_id           = module.vpc.private_subnet_ids[0]
+  security_group_id   = module.ec2_sg.security_group_id
+  source_dest_check   = false
+  availability_zone   = "us-east-1a"
+  root_device_name    = "/dev/xvda"
+  volume_size         = 8
+  volume_type         = "gp3"
+  associate_public_ip = false
+  spot_instance       = false
+
+  tags = merge(local.tags, {
+    "kubernetes-role" = "master"
+  })
+}
+
+module "k8s_worker_1" {
+  source              = "../modules/aws-ec2"
+  name                = "k8s-worker-1"
+  ami_id              = "ami-0d1b5a8c13042c939"
+  instance_type       = "t2.micro"
+  key_name            = module.keypair.key_name
+  subnet_id           = module.vpc.private_subnet_ids[0]
+  security_group_id   = module.ec2_sg.security_group_id
+  source_dest_check   = false
+  availability_zone   = "us-east-1a"
+  root_device_name    = "/dev/xvda"
+  volume_size         = 8
+  volume_type         = "gp3"
+  associate_public_ip = false
+  spot_instance       = true
+
+  tags = merge(local.tags, {
+    "kubernetes-role" = "worker"
+  })
 }
