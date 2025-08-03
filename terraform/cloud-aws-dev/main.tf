@@ -2,15 +2,6 @@ provider "aws" {
   region = "us-east-1"
 }
 
-locals {
-  tags = {
-    Project     = "clodstco"
-    Environment = "dev"
-  }
-
-  az = "us-east-1a"
-}
-
 module "keypair" {
   source          = "../modules/aws-keypair"
   key_name        = "clodstco-keypair"
@@ -73,12 +64,8 @@ module "bastion_instance" {
   source_dest_check   = false
   availability_zone   = local.az
   associate_public_ip = true
-
-  root_block_device = {
-    volume_size = 8
-    volume_type = "gp3"
-    delete_on_termination = true
-  }
+  volume_size         = 8
+  volume_type         = "gp3"
 
   tags = merge(local.tags, {
     Name    = "clodstco-bastion"
@@ -99,12 +86,8 @@ module "k8s_master" {
   availability_zone   = local.az
   associate_public_ip = false
   spot_instance       = false
-
-  root_block_device = {
-    volume_size = 8
-    volume_type = "gp3"
-    delete_on_termination = true
-  }
+  volume_size         = 8
+  volume_type         = "gp3"
 
   tags = merge(local.tags, {
     "kubernetes-role" = "master"
@@ -123,12 +106,8 @@ module "k8s_worker_1" {
   availability_zone   = local.az
   associate_public_ip = false
   spot_instance       = true
-
-  root_block_device = {
-    volume_size = 8
-    volume_type = "gp3"
-    delete_on_termination = true
-  }
+  volume_size         = 8
+  volume_type         = "gp3"
 
   tags = merge(local.tags, {
     "kubernetes-role" = "worker"
